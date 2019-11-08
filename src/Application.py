@@ -1,58 +1,35 @@
-import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
-
-mnist = input_data.read_data_sets("../tmp/data/", one_hot=True)
-
-n_nodes_hl = 500
-
-n_classes = 10
-batch_size = 100
-
-in_data_size = 784  # photos 28x28
-x = tf.placeholder('float', [None, in_data_size])
-y = tf.placeholder('float')
+from src.data.DataFormatter import DataFormatter
+from src.images.ImagesLoader import ImagesLoader
+from src.neuralnetwork.NeuralNetworkImages import NeuralNetwork as ImageNeuralNetwork
+from src.neuralnetwork.NeuralNetworkMinistData import NeuralNetwork as MinistNeuralNetwork
 
 
-def neural_network_model(data):
-
-    hidden_layer = {'widths': tf.Variable(tf.random_normal([in_data_size, n_nodes_hl])),
-                    'biases': tf.Variable(tf.random_normal([n_nodes_hl]))}
-
-    output_layer = {'widths': tf.Variable(tf.random_normal([n_nodes_hl, n_classes])),
-                    'biases': tf.Variable(tf.random_normal([n_classes]))}
-
-    layer_1 = tf.add(tf.matmul(data, hidden_layer['widths']), hidden_layer['biases'])
-    layer_1 = tf.nn.relu(layer_1)
-
-    output = tf.add(tf.matmul(layer_1, output_layer['widths']), output_layer['biases'])
-
-    return output
+def run_minist_learning():
+    nn = MinistNeuralNetwork()
+    nn.train_neural_network()
 
 
-def train_neural_network(train_data):
-    prediction = neural_network_model(train_data)
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
-    # learning_rate = 0.001
-    optimizer = tf.train.AdamOptimizer().minimize(cost)
+def run_image_learning():
+    data_loader = ImagesLoader()
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 01/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 02/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 03/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 04/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 05/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 06/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 07/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 08/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 09/*.bmp")
+    data_loader.load_dara_and_add_as_class("../../Data/Kwadraty_25/osoba 10/*.bmp")
 
-    hm_epochs = 20
+    tender, number_of_classes = data_loader.get_data()
+    train_x, train_y, test_x, test_y = DataFormatter.format_data(tender)
+    nn = ImageNeuralNetwork(train_x, train_y, test_x, test_y, number_of_classes)
+    nn.train_neural_network()
 
-    with tf.Session() as session:
-        session.run(tf.initialize_all_variables())
-
-        # training
-        for epoch in range(hm_epochs):
-            epoch_loss = 0
-            for feedback in range(int(mnist.train.num_examples/batch_size)):
-                epoch_x, epoch_y = mnist.train.next_batch(batch_size)
-                feedback, c = session.run([optimizer, cost], feed_dict={x: epoch_x, y: epoch_y})
-                epoch_loss += c
-            print('Epoch: ' + str(epoch+1) + ' out of: ' + str(hm_epochs) + ' loss: ' + str(epoch_loss))
-
-        # print current accuracy
-        correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
-        accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
-        print('Accuracy: ' + str(accuracy.eval({x: mnist.test.images, y: mnist.test.labels})))
+    print()
+    print(number_of_classes)
 
 
-train_neural_network(x)
+if __name__ == "__main__":
+    run_image_learning()
