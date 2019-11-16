@@ -19,7 +19,7 @@ class ImagesLoader:
             self.tender[index][1].append(0)
 
         for data in data_vector:
-            processed_data = np.array(data).flatten()  ## flattens arrays to one array [R G B A  R G B A]
+            processed_data = np.array(data).flatten()  ## flattens arrays to one array [R G B A  R G B A] or [L L L L]
             self.tender.append([processed_data, self.classes[:]])
 
         self.classes[-1] = 0

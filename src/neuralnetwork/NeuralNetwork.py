@@ -1,10 +1,12 @@
+import time
+
 import tensorflow as tf
 import numpy as np
 
 
 class NeuralNetwork:
 
-    def __init__(self, train_x, train_y, test_x, test_y, number_of_classes, batch_size=100):
+    def __init__(self, train_x, train_y, test_x, test_y, number_of_classes, epoch=25, batch_size=100):
 
         self.train_x = train_x
         self.train_y = train_y
@@ -12,6 +14,9 @@ class NeuralNetwork:
         self.test_y = test_y
         self.n_classes = number_of_classes
         self.batch_size = batch_size
+        self.epoch = epoch
+        self.accuracy = 0
+        self.time_of_training = 0
 
         self.in_data_size = len(train_x[0])
         self.x = tf.placeholder('float', [None, self.in_data_size])
@@ -19,27 +24,17 @@ class NeuralNetwork:
 
     n_nodes_hl = 500
 
-    def __neural_network_model(self, data):
-        hidden_layer = {'widths': tf.Variable(tf.random_normal([self.in_data_size, self.n_nodes_hl])),
-                        'biases': tf.Variable(tf.random_normal([self.n_nodes_hl]))}
-
-        output_layer = {'widths': tf.Variable(tf.random_normal([self.n_nodes_hl, self.n_classes])),
-                        'biases': tf.Variable(tf.random_normal([self.n_classes]))}
-
-        layer_1 = tf.add(tf.matmul(data, hidden_layer['widths']), hidden_layer['biases'])
-        layer_1 = tf.nn.relu(layer_1)
-
-        output = tf.add(tf.matmul(layer_1, output_layer['widths']), output_layer['biases'])
-
-        return output
+    def neural_network_model(self, data):
+        return 0
 
     def train_neural_network(self):
-        prediction = self.__neural_network_model(self.x)
+        startTime = time.time()
+        prediction = self.neural_network_model(self.x)
         cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=self.y))
         # learning_rate = 0.001
         optimizer = tf.train.AdamOptimizer().minimize(cost)
 
-        hm_epochs = 100
+        hm_epochs = self.epoch
 
         with tf.Session() as session:
             session.run(tf.initialize_all_variables())
@@ -63,4 +58,5 @@ class NeuralNetwork:
             # print current accuracy
             correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(self.y, 1))
             accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
-            print('Accuracy: ' + str(accuracy.eval({self.x: self.test_x, self.y: self.test_y})))
+            self.accuracy = accuracy.eval({self.x: self.test_x, self.y: self.test_y})
+            self.time_of_training = time.time() - startTime
