@@ -24,10 +24,10 @@ class ConvolutionNeuralNetwork(NeuralNetwork):
 
         x = tf.reshape(data, shape=[-1, 25, 25, 1])
 
-        conv1 = self.__conv_2d(x, weights['W_conv1'])
+        conv1 = tf.nn.relu(self.__conv_2d(x, weights['W_conv1'])+biases['B_conv1'])
         conv1 = self.__max_pool_2d(conv1)
 
-        conv2 = self.__conv_2d(conv1, weights['W_conv2'])
+        conv2 = tf.nn.relu(self.__conv_2d(conv1, weights['W_conv2'])+biases['B_conv2'])
         conv2 = self.__max_pool_2d(conv2)
 
         fc = tf.reshape(conv2, [-1, 7*7*64])

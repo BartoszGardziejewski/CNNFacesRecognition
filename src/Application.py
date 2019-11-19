@@ -25,18 +25,19 @@ def run_image_learning():
     tender, number_of_classes = data_loader.get_data()
     accuracy_sum = 0
     time_sum = 0
-    iterations = 10
+    iterations = 1
 
     for n in range(0, iterations):
         train_x, train_y, test_x, test_y = DataFormatter.format_data(tender)
-        cnn = ConvolutionNeuralNetwork(train_x, train_y, test_x, test_y, number_of_classes, epoch=30)
-        cnn.train_neural_network()
+        nn = ConvolutionNeuralNetwork(train_x, train_y, test_x, test_y, number_of_classes, epoch=100)
+        #nn = MultilayerPerceptronNeuralNetwork(train_x, train_y, test_x, test_y, number_of_classes, epoch=50)
+        nn.train_neural_network()
 
-        accuracy_sum += cnn.accuracy
-        time_sum += cnn.time_of_training
+        accuracy_sum += nn.accuracy
+        time_sum += nn.time_of_training
         print(
-            "ConvolutionNeuralNetwork accuracy: " + str(cnn.accuracy) +
-            ", time of training: " + str(cnn.time_of_training) + " s ")
+            "ConvolutionNeuralNetwork accuracy: " + str(nn.accuracy) +
+            ", time of training: " + str(nn.time_of_training) + " s ")
 
     average_time = time_sum/iterations
     average_accuracy = accuracy_sum/iterations
